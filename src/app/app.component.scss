@@ -1,0 +1,19 @@
+#container {
+  width: 100vw;
+  height: 100vh;
+}
+
+.info {
+  padding: 0.25rem 0.75rem;
+  margin-bottom: 1rem;
+  border-radius: 0.25rem;
+  position: fixed;
+  top: 1rem;
+  background-color: white;
+  width: auto;
+  // min-width: 22rem;
+  border-width: 0;
+  right: 1rem;
+  box-shadow: 0 2px 6px 0 rgb(114 124 245 / 50%);
+  cursor: pointer;
+}

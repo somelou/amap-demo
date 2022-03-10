@@ -6,22 +6,58 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
-## Code scaffolding
+## 复现方法
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+### 环境
 
-## Build
+Angular12
+node12.20
+js apiv2.0（v1.4.5下正常）
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+在`src/app/app.component.ts`中调用`Map.clearMap()`方法后提示：
 
-## Running unit tests
+```bash
+TypeError: undefined is not an object (evaluating 't._opts.innerOverlay')
+```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+（可点击页面右上角调用`clearMap()`)
 
-## Running end-to-end tests
+经测试，**仅当自定义Array的后prototype方法出现上述错误**。
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+在 `src/extension/array.d.ts` 中增加 `Array` 的prototype方法，如：
 
-## Further help
+```typescript
+declare global {
+  
+  interface Array<T> {
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+    /**
+     * 数组去重
+     */
+    unique(): Array<T>;
+  }
+}
+
+export {};
+```
+
+并在`src/extension/implement/array.ts`实现：
+
+```typescript
+Array.prototype.unique = function <T>(): Array<T> {
+  return Array.from(new Set(this));
+};
+```
+
+在`main.ts`中引入`arrays.ts`:
+
+```typescript
+import 'src/extension/implement/array';
+
+if (environment.production) {
+  enableProdMode();
+}
+
+platformBrowserDynamic().bootstrapModule(AppModule)
+  .catch(err => console.error(err));
+```
